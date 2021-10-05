@@ -26,7 +26,7 @@ def main():
     if len(sys.argv) < 2:
         print('usage: subscriber <connect_to> [topic topic ...]')
         sys.exit(1)
-
+ 
     connect_to = sys.argv[1]
     topics = sys.argv[2:]
     ctx = zmq.Context()
