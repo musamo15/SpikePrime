@@ -1,25 +1,31 @@
+from spike import Singleton
+
 class Motor:
 
-    def __init__(self,id,speed,rotation,stopAction):
+    def __init__(self,id):
         self.id = id
-        self.speed = speed
-        self.rotation = rotation
-        self.stopAction = stopAction
-        self.unit = "cm"
+        self.speed = 0
+        self.rotation = 0
+        self.stopAction = "brake"
+        self.unit = "rotations"
         self.currentMessageDict = {}
+        self.singleTon = Singleton.getInstance()
+
     def setRotation(self,rotation,unit):
         if self.rotation != rotation:
             self.rotation = rotation
         if self.unit != unit:
             self.unit = unit
+            
     def setSpeed(self,newSpeed):
-        if isinstance(newSpeed,int):
+        if(newSpeed == None):
+            self.speed = 0
+        elif isinstance(newSpeed,int):
             if self.speed != newSpeed:
                 self.speed = newSpeed
         else:
             raise Exception("Type Error, The new speed is not an int")
         
-
     def setUnit(self,newUnit):
         if isinstance(newUnit,str):
             if self.unit != newUnit:
@@ -38,7 +44,7 @@ class Motor:
         else:
             raise Exception("Type Error, the new stop action is not a string")
     
-    def set_degrees_counted(degrees):
+    def set_degrees_counted(self,degrees):
         degrees_counted = degrees
 
     def set_default_speed(speed):
@@ -69,23 +75,24 @@ class Motor:
     def get_degrees_counted(self):
         return #DEGREES COUNTED FROM UNITY
 
-    def get_default_speed():
+    def get_default_speed(self):
         return #SPEED OF DEFAULT MOTOR??
-
+    
     #json being sent to unity 
-    def get_messageDict(self,amount,steering):
+    def get_messageDict(self,amount=0,steering=0):
         dict = {
-            "id":self.getId(),
+            "type":"motor",
+            "id":self.get_id(),
             "amount":amount,
-            "rotation":self.getRotation(),
-            "speed":self.getSpeed(),            
-            "unit":self.getUnit(),
+            "rotation":self.get_rotation(),
+            "speed":self.get_speed(),            
+            "unit":self.unit,
             "steering":steering,
             "stall":"true"
         }
         return dict   
 
-    def send_message(self,newDict):
+    def should_send_message(self,newDict):
         isValid = False
         if isinstance(newDict,dict):
             if self.currentMessageDict != newDict:
@@ -120,19 +127,14 @@ class Motor:
 
     #starts the motor
     #SEND START SIGNAL TO UNITY
-    def start(self,amount,unit,steering,speed):
-        if isinstance(steering,int):
-            if steering < -100 and steering > 100:
-                raise Exception("ValueError, The value of steering is not within -100 to 100")
-        else:
-                raise Exception("TypeError, steering is not an int")
+    def start(self,speed = None):
 
-        self.setUnit(unit)
         self.setSpeed(speed)
 
-        motorDict = self.getMessageDict(amount, steering)
-        if self.sendMessage(motorDict):
+        motorDict = self.get_messageDict()
+        if  self.should_send_message(motorDict) == True:
             print(motorDict)
+            self.singleTon.getTranslator().sendMessageToUnity(motorDict)
 
     #stops the motor
     #SEND STOP SIGNAL TO UNITY

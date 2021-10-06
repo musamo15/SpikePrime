@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 from ColorSensor import ColorSensor
+from Motor import Motor
 from spike import PrimeHub
 
 hub = PrimeHub()
 
-color = ColorSensor()
-
-print(color.getColor())
+motor = Motor("A")
+motor.start()
 
