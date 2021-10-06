@@ -1,22 +1,10 @@
 #!/usr/bin/python3
-from spike import ColorSensor
+from ColorSensor import ColorSensor
+from spike import PrimeHub
 
-# Initialize the Color Sensor
+hub = PrimeHub()
 
-paper_scanner = ColorSensor('E')
+color = ColorSensor()
 
+color.getColor()
 
-# Measure the color
-
-color = paper_scanner.get_color()
-
-
-# Print the color name to the console
-
-print('Detected:', color)
-
-
-# Check if it's a specific color
-
-if color == 'red':
-    print('It is red!')

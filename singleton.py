@@ -1,4 +1,5 @@
-from Translator import translator
+from Translator import translator 
+
 class Singleton:
    __instance = None
 
@@ -16,14 +17,21 @@ class Singleton:
       else:
          Singleton.__instance = self
       
-      self.translator = translator()
+      self.currentColor = None
+      self.currentSpeed = None
+      self.translator = Translator()
+
+def getTranslator(self):
+    return self.translator
     
-   def getTranslator(self):
-        return self.translator
-     
-class PrimeHub:
-    
-    def __init__(self):
-        # Create Sensors
-        print("Created Prime Hub")
-        self.singleTon = Singleton.getInstance()
+      
+
+
+s = Singleton()
+print (s)
+
+s = Singleton.getInstance()
+print (s)
+
+s = Singleton.getInstance()
+print (s)
