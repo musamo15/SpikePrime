@@ -6,5 +6,5 @@ hub = PrimeHub()
 
 color = ColorSensor()
 
-color.getColor()
+print(color.getColor())
 

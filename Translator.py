@@ -19,7 +19,20 @@ class translator():
         self.socket = context.socket(zmq.REP)
         self.socket.bind("tcp://*:%s" % port)
 
-        self.messageDict = {}
+        self.messageDict = {
+            
+            "color" : {
+                "currentColor" : None
+            },
+            
+            "motor" : {
+                "amount": 0,
+                "rotation": 0,
+                "speed": 0,            
+                "unit": 0,
+                "steering": 0
+            }
+        }
         self.thread = threading.Thread(target=self.run, args=())
         self.thread.daemon = True                            # Daemonize thread
         self.thread.start()                                  # Start the execution
@@ -30,8 +43,9 @@ class translator():
             while True:
                 # Handle Recieve
                 print("Recieving Messages: ") 
+                self.messageDict["color"]["currentColor"] = "Blue"
                 self.messageDict = self.socket.recv_json()   
-
+                
                 # Handle Send
                 self.socket.send_string("Recieved ")
         except KeyboardInterrupt:
