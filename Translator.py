@@ -2,6 +2,7 @@
 import threading
 import zmq
 import time
+import json
 
 class translator():
     """ Threading example class
@@ -33,27 +34,30 @@ class translator():
                 "steering": 0
             }
         }
-        self.thread = threading.Thread(target=self.run, args=())
-        self.thread.daemon = True                            # Daemonize thread
-        self.thread.start()                                  # Start the execution
-    
+        self.thread = None
+        
     def run(self):
         """ Method that runs forever """
         try:
-            while True:
+            currentVal = True
+            while currentVal:
                 # Handle Recieve
                 print("Recieving Messages: ") 
                 self.messageDict["color"]["currentColor"] = "Blue"
+                self.socket.recv_json()   
+                json.loads(self.socket.recv_json())
                 self.messageDict = self.socket.recv_json()   
                 
                 # Handle Send
                 self.socket.send_string("Recieved ")
+                currentVal = False
         except KeyboardInterrupt:
             print("Exiting Application")
     
     def getMessage(self,type):
-        print("Here")
-        time.sleep(2)
+        self.thread = threading.Thread(target=self.run, args=(),daemon=False)
+        self.thread.start()                                 
+        self.thread.join()
         return self.messageDict[type]
 
 
