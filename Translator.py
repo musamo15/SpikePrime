@@ -47,34 +47,31 @@ class translator():
                 # Handle Recieve
                 print("Recieving Messages: ") 
                 self.messageDict["color"]["currentColor"] = "Blue"
-                self.socket.recv_json()   
-                json.loads(self.socket.recv_json())
-                self.messageDict = self.socket.recv_json()   
+                self.socket.recv()    
                 
                 # Handle Send
                 if self.sendMessage == True:
                     print("Sending new Data to python")
-                    self.socket.send_json(json.dumps(self.newMessage))
+                    self.socket.send_string(str(json.dumps(self.newMessage)))
                     self.sendMessage = False
                 else:
                     self.socket.send_string("Recieved Message")
                 currentVal = False
         except KeyboardInterrupt:
             print("Exiting Application")
-    def __str__(self) -> str:
-        return "Hello World"
+    
     def getMessage(self,type):
         self.thread = threading.Thread(target=self.run, args=(),daemon=False)
         self.thread.start()                                 
         self.thread.join()
         return self.messageDict[type]
 
-    def sendMessageToUnity(self,message):
+    def sendMessageToUnity(self,dictionary):
         self.sendMessage = True
-        self.newMessage = message
+        self.newMessage = dictionary
         self.thread = threading.Thread(target=self.run, args=(),daemon=False)
         self.thread.start()                                 
         self.thread.join()
-        
+            
 
 

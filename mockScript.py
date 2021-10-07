@@ -6,5 +6,8 @@ from spike import PrimeHub
 hub = PrimeHub()
 
 motor = Motor("A")
-motor.start()
+motor.start(0)
 
+# motor.start(10)
+#color = ColorSensor()
+#print(color.getColor())
