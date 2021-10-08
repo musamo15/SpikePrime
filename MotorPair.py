@@ -24,3 +24,19 @@ class MotorPair:
 
     def get_default_speed(self):
         return self.leftMotor.getSpeed()
+
+    #move motor pair using differential (tank) steering a certain distance
+    def move_tank(amount, unit, left_speed, right_speed):
+        return 
+        
+    #start moving motor pair using differential (tank) steering
+    def start_tank(left_speed, right_speed):
+        return
+
+    #starts moving driving base at specific power 
+    def start_at_power(power, steering):
+        return
+
+    #starts moving driving base at specific power for each motor
+    def start_tank_at_power(left_power, right_power):
+        return
