@@ -3,8 +3,9 @@ import threading
 import zmq
 import time
 import json
-
+import copy
 from zmq.sugar.frame import Message
+import traceback
 
 class translator():
     """ Threading example class
@@ -38,6 +39,7 @@ class translator():
             }
         }
         self.thread = None
+        self.newData = None
         
     def run(self):
         """ Method that runs forever """
@@ -45,25 +47,30 @@ class translator():
             currentVal = True
             while currentVal:
                 # Handle Recieve
-                print("Recieving Messages: ") 
-                self.messageDict["color"]["currentColor"] = "Blue"
-                self.socket.recv()    
-                
-                # Handle Send
-                if self.sendMessage == True:
-                    print("Sending new Data to python")
-                    self.socket.send_string(str(json.dumps(self.newMessage)))
-                    self.sendMessage = False
-                else:
-                    self.socket.send_string("Recieved Message")
-                currentVal = False
-        except KeyboardInterrupt:
+                try:
+                    self.newData = self.socket.recv(copy=True)
+
+                    # Handle Send
+                    if self.sendMessage == True:
+                        print("Sending new Data to python")
+                        self.socket.send_string(str(json.dumps(self.newMessage)))
+                        self.sendMessage = False
+                    else:
+                        self.socket.send_string("Recieved Message")
+                    currentVal = False
+                except Exception:
+                    print("Exception On Message Thread")
+                    self.socket.close(linger=1000)
+        except Exception:
             print("Exiting Application")
+            self.socket.close(linger=1000)
     
     def getMessage(self,type):
         self.thread = threading.Thread(target=self.run, args=(),daemon=False)
         self.thread.start()                                 
         self.thread.join()
+        if self.newData != None:
+            self.handleDataFromUnity(self.newData)
         return self.messageDict[type]
 
     def sendMessageToUnity(self,dictionary):
@@ -72,6 +79,20 @@ class translator():
         self.thread = threading.Thread(target=self.run, args=(),daemon=False)
         self.thread.start()                                 
         self.thread.join()
-            
-
-
+      
+           
+    def handleDataFromUnity(self,message):
+        # try:
+        #     for message in message.split(','):
+        #         dict = eval(message)
+        #         print(dict)
+        #         for key in dict.keys():
+        #             self.messageDict[key] = dict[key]
+        # except Exception:
+        #     print("Exception While Parsing Data")
+        try:
+           dict = eval(message)
+           for key in dict.keys():
+                self.messageDict[key] = dict[key]
+        except Exception:
+            print("Exception While Parsing Data")

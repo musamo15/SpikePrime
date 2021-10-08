@@ -5,9 +5,42 @@ from spike import PrimeHub
 
 hub = PrimeHub()
 
-motor = Motor("A")
-motor.start(0)
+colorSensor = ColorSensor()
 
-# motor.start(10)
-#color = ColorSensor()
-#print(color.getColor())
+lMotor = Motor("A")
+rMotor = Motor("B")
+
+lMotor.start(5)
+rMotor.start(5)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# while(True):
+#     color = colorSensor.get_color()
+#     if color  == "Violet":
+#         lMotor.start(-5)
+#         rMotor.start(5)
+#     # elif color == "":
+
+#     # elif color == "":  
+        
+
+
+

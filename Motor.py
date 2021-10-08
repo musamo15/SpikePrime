@@ -133,8 +133,6 @@ class Motor:
 
         motorDict = self.get_messageDict()
         if  self.should_send_message(motorDict) == True:
-            print(motorDict)
-            
             self.singleTon.getTranslator().sendMessageToUnity(motorDict)
 
     #stops the motor

@@ -78,7 +78,7 @@ class ColorSensor:
 
     #sets brightness of individual lights on the color sensor at specified brightness
     def light_up(self, light1, light2, light3):
-        self.light1Brightness() = light1
-        self.light2Brightness() = light2
-        self.light3Brightness() = light3
+        self.light1Brightness = light1
+        self.light2Brightness = light2
+        self.light3Brightness = light3
  
