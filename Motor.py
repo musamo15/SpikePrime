@@ -82,9 +82,9 @@ class Motor:
     def get_messageDict(self,amount=0,steering=0):
         dict = {
             "type":"motor",
-            "id":self.get_id(),
+            "id":self.__get_id(),
             "amount":amount,
-            "rotation":self.get_rotation(),
+            "rotation":self.__get_rotation(),
             "speed":self.get_speed(),            
             "unit":self.unit,
             "steering":steering,
