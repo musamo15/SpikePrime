@@ -11,7 +11,7 @@ class Motor:
         self.currentMessageDict = {}
         self.singleTon = Singleton.getInstance()
 
-    def setRotation(self,rotation,unit):
+    def __setRotation(self,rotation,unit):
         if self.rotation != rotation:
             self.rotation = rotation
         if self.unit != unit:
@@ -40,7 +40,7 @@ class Motor:
                     if self.stopAction != stopAction:
                         self.stopAction = stopAction
                 else:
-                    raise Exception("Stop action is not valid (coast, brake, or hold")
+                    raise Exception("Stop action is not valid (coast, brake, or hold)")
         else:
             raise Exception("Type Error, the new stop action is not a string")
     
@@ -60,13 +60,13 @@ class Motor:
         else:
             raise Exception("TypeError, stallValue is not a boolean") 
 
-    def get_id(self):
+    def __get_id(self):
         return self.id
     
     def get_speed(self):
         return self.speed    
 
-    def get_rotation(self):
+    def __get_rotation(self):
         return self.rotation
 
     def get_position(self):
