@@ -1,4 +1,4 @@
-from spike import Singleton
+from .Translator import Translator
 
 class ColorSensor:
 
@@ -10,10 +10,10 @@ class ColorSensor:
         self.light2Brightness = 0
         self.light3Brightness = 0
 
-        self.singleTon = Singleton.getInstance()
+        self.translator = Translator.getInstance()
 
     def get_color(self):
-        colorDict = self.singleTon.getTranslator().getMessage("color")
+        colorDict = self.translator.getMessage("color")
         messageColor = colorDict["currentColor"]
         """
         {

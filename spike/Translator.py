@@ -1,4 +1,3 @@
-
 import threading
 import zmq
 import time
@@ -7,17 +6,18 @@ import copy
 from zmq.sugar.frame import Message
 import traceback
 
-class translator():
-    """ Threading example class
-    The run() method will be started and it will run in the background
-    until the application exits.
-    """
+class Translator():
+
+    __instance = None
 
     def __init__(self):
-        """ Constructor
-        :type interval: int
-        :param interval: Check interval, in seconds
-        """
+        
+        if Translator.__instance != None:
+            raise Exception("This class is a singleton!")
+        else:
+             Translator.__instance = self
+
+
         port = 5556
         context = zmq.Context()
         self.socket = context.socket(zmq.REP)
@@ -40,7 +40,15 @@ class translator():
         }
         self.thread = None
         self.newData = None
-        
+
+    @staticmethod 
+    def getInstance():
+      """ Static access method. """
+      if Translator.__instance == None:
+         Translator()
+      return Translator.__instance
+
+
     def run(self):
         """ Method that runs forever """
         try:

@@ -1,4 +1,4 @@
-from spike import Singleton
+from .Translator import Translator
 
 class Motor:
 
@@ -9,7 +9,7 @@ class Motor:
         self.stopAction = "brake"
         self.unit = "rotations"
         self.currentMessageDict = {}
-        self.singleTon = Singleton.getInstance()
+        self.translator = Translator.getInstance()
 
     def __setRotation(self,rotation,unit):
         if self.rotation != rotation:
@@ -133,7 +133,7 @@ class Motor:
 
         motorDict = self.get_messageDict()
         if  self.should_send_message(motorDict) == True:
-            self.singleTon.getTranslator().sendMessageToUnity(motorDict)
+            self.translator.sendMessageToUnity(motorDict)
 
     #stops the motor
     #SEND STOP SIGNAL TO UNITY

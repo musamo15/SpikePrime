@@ -1,8 +1,7 @@
 #!/usr/bin/python3
-from ColorSensor import ColorSensor
-from Motor import Motor
 from spike import PrimeHub
-
+from spike import Motor
+from spike import ColorSensor
 hub = PrimeHub()
 
 colorSensor = ColorSensor()
