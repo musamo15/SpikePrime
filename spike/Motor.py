@@ -5,19 +5,20 @@ class Motor:
     def __init__(self,id):
         self.id = id
         self.speed = 0
-        self.rotation = 0
-        self.stopAction = "brake"
+        self.rotation = 0.0
+        self.stopAction = "coast"
         self.unit = "rotations"
         self.currentMessageDict = {}
         self.translator = Translator.getInstance()
+        self.default_speed = None
 
-    def __setRotation(self,rotation,unit):
+    def __set_rotations(self,rotation,unit):
         if self.rotation != rotation:
             self.rotation = rotation
         if self.unit != unit:
             self.unit = unit
             
-    def setSpeed(self,newSpeed):
+    def __set_speed(self,newSpeed):
         if(newSpeed == None):
             self.speed = 0
         elif isinstance(newSpeed,int):
@@ -26,30 +27,34 @@ class Motor:
         else:
             raise Exception("Type Error, The new speed is not an int")
         
-    def setUnit(self,newUnit):
+    #need list of acceptable units (rotations,sec,in,cm,degrees?)
+    def __set_unit(self,newUnit):
         if isinstance(newUnit,str):
             if self.unit != newUnit:
                 self.unit = newUnit
         else:
             raise Exception("Type Error, the new unit is not a string")
 
-    def setStopAction(self,stopAction):
+    def set_stop_action(self,stopAction):
         actions = ["coast", "brake", "hold"]
         if isinstance(stopAction,str):
                 if stopAction in actions:
                     if self.stopAction != stopAction:
                         self.stopAction = stopAction
                 else:
-                    raise Exception("Stop action is not valid (coast, brake, or hold)")
+                    raise Exception("ValueError, action is not one of the allowed values (coast, brake, or hold)")
         else:
-            raise Exception("Type Error, the new stop action is not a string")
+            raise Exception("TypeError, the new stop action is not a string")
     
     def set_degrees_counted(self,degrees):
         degrees_counted = degrees
 
-    def set_default_speed(speed):
-        #sets default motor speed??
-        return
+    def set_default_speed(self, newDefSpeed):
+        if isinstance(newDefSpeed, int):
+            if self.default_speed != newDefSpeed:
+                self.default_speed = newDefSpeed
+        else:
+            raise Exception("TypeError, default_speed is not an integer")
 
     #Sets whether or not stall detection is on
     #Stall detection turns motor off if it gets stuck, powers off after 2 seconds
@@ -76,10 +81,13 @@ class Motor:
         return #DEGREES COUNTED FROM UNITY
 
     def get_default_speed(self):
-        return #SPEED OF DEFAULT MOTOR??
+        if(self.default_speed == None):
+            print("No default speed")
+        else:
+            return self.default_speed
     
     #json being sent to unity 
-    def get_messageDict(self,amount=0,steering=0):
+    def __get_messageDict(self,amount=0,steering=0):
         dict = {
             "motorMessage": 
                 {
@@ -89,13 +97,13 @@ class Motor:
                     "speed":self.get_speed(),            
                     "unit":self.unit,
                     "steering":steering,
-                    "stall":"true"
+                    "stall":"true",
+                    "default_speed": self.get_default_speed()
                 }
-           
         }
         return dict   
 
-    def should_send_message(self,newDict):
+    def __should_send_message(self,newDict):
         isValid = False
         if isinstance(newDict,dict):
             if self.currentMessageDict != newDict:
@@ -104,45 +112,66 @@ class Motor:
         return isValid
 
     def run_to_position(degrees, direction, speed):
-        #runs motor to an absolute position
+        #runs motor to an absolute position (rotates motor X degrees), degrees 0-359
+        #"Shortest path", "Clockwise", "Counterclockwise" are options for direction.
         #NEED DATA FROM UNITY
         return
 
-    def run_to_degrees_counted(degrees, speed):
+    def run_to_degrees_counted(self,degrees, speed):
         #runs motor until # of degrees counted is equal to degrees parameter
+        if isinstance(degrees, int):
+            if isinstance(speed, int):
+                self.__set_unit("degrees")
+                self.set_degrees_counted(degrees)
+                self.start(speed)
+            else:
+                raise Exception("TypeError, speed is not an integer")
+        else:
+            raise Exception("TypeError, degrees is not an integer")
         #UNITY DATA
-        return
 
     def run_for_degrees(degrees, speed):
         #runs motor for a specified # of degrees
         #UNITY DATA 
         return
 
-    def run_for_rotations(rotations, speed):
-        #runs motor for specified # of rotations
-        #UNITY DATA
-        return
+    #runs motor for specified # of rotations
+    def run_for_rotations(self, rotations, speed):
+        if isinstance(rotations, float):
+            if isinstance(speed, int):
+                self.__set_unit("rotations")
+                self.__set_rotations(rotations)
+                self.start(speed)
+            else:
+                raise Exception("TypeError, speed is not an int")
+        else:
+            raise Exception("TypeError, rotations is not a float")
 
-    def run_for_seconds(seconds, speed):
+    def run_for_seconds(self, seconds, speed):
         #runs motor for specified # of seconds
         #UNITY DATA
         return
 
     #starts the motor
     #SEND START SIGNAL TO UNITY
-    def start(self,speed = None):
+    def start(self,speed = None ):
 
-        self.setSpeed(speed)
+        self.__set_speed(speed)
 
         motorDict = self.get_messageDict()
         if  self.should_send_message(motorDict) == True:
             self.translator.sendMessageToUnity(motorDict)
-
-    #stops the motor
+    #stops the motor, not very smoothly i think
     #SEND STOP SIGNAL TO UNITY
     def stop(self):
-        for i in range(self.speed, 0, -1):
-            self.speed -= 1
+        if(self.stopAction == "hold"):
+            #what does hold mean
+            something
+        elif(self.stopAction == "break"):
+            self.__set_speed(0)
+        elif(self.stopAction == "coast"):
+           #math to make vehicle coast
+           something
 
     def start_at_power(power):
         #starts at specified power level
@@ -152,5 +181,7 @@ class Motor:
     def was_interrupted():
         return #BOOL- whether or not motor was interrupted
 
+    #possible int tracker (0,1,2)
+    #0 - motor stall detection on, 1 - motor stall detection off, 2 - motor is stalled
     def was_stalled():
         return #BOOL- whether or not motor was stalled
