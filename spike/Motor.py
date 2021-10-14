@@ -11,6 +11,7 @@ class Motor:
         self.currentMessageDict = {}
         self.translator = Translator.getInstance()
         self.default_speed = None
+        self.position = (0,0)
 
     def __set_rotations(self,rotation,unit):
         if self.rotation != rotation:
@@ -75,8 +76,13 @@ class Motor:
         return self.rotation
 
     def get_position(self):
-        return #POSITION FROM UNITY SIM
+        motorDict = self.translator.getMessage("position")
+        currentPos = motorDict["currentPosition"]
 
+        if currentPos != self.position:
+            self.position = currentPos
+        return self.position 
+        
     def get_degrees_counted(self):
         return #DEGREES COUNTED FROM UNITY
 
