@@ -22,8 +22,9 @@ class Motor:
         if(newSpeed == None):
             self.speed = 0
         elif isinstance(newSpeed,int):
-            if self.speed != newSpeed:
-                self.speed = newSpeed
+            if(-100 <= newSpeed <= 100):
+                if self.speed != newSpeed:
+                    self.speed = newSpeed
         else:
             raise Exception("Type Error, The new speed is not an int")
         
@@ -51,8 +52,9 @@ class Motor:
 
     def set_default_speed(self, newDefSpeed):
         if isinstance(newDefSpeed, int):
-            if self.default_speed != newDefSpeed:
-                self.default_speed = newDefSpeed
+            if(-100 <= newDefSpeed <= 100):
+                if self.default_speed != newDefSpeed:
+                    self.default_speed = newDefSpeed
         else:
             raise Exception("TypeError, default_speed is not an integer")
 
@@ -165,8 +167,8 @@ class Motor:
     #SEND STOP SIGNAL TO UNITY
     def stop(self):
         if(self.stopAction == "hold"):
-            #what does hold mean
-            something
+            #holding will acitvely drive motor to whatever the end condition is
+            pass
         elif(self.stopAction == "break"):
             self.__set_speed(0)
         elif(self.stopAction == "coast"):
