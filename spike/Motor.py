@@ -19,9 +19,7 @@ class Motor:
             self.unit = unit
             
     def __set_speed(self,newSpeed):
-        if(newSpeed == None):
-            self.speed = 0
-        elif isinstance(newSpeed,int):
+        if isinstance(newSpeed,int):
             if(-100 <= newSpeed <= 100):
                 if self.speed != newSpeed:
                     self.speed = newSpeed
@@ -173,7 +171,7 @@ class Motor:
             self.__set_speed(0)
         elif(self.stopAction == "coast"):
            #math to make vehicle coast
-           something
+           pass
 
     def start_at_power(power):
         #starts at specified power level
