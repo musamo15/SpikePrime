@@ -8,9 +8,11 @@ colorSensor = ColorSensor()
 
 lMotor = Motor("A")
 rMotor = Motor("B")
+lMotor.set_default_speed(111110)
 
-lMotor.start(15)
-rMotor.start(15)
+# lMotor.start(15)
+# rMotor.start(15)
+
 
 
 #Turn right on LightBlue

@@ -1,10 +1,7 @@
 import threading
 import zmq
-import time
 import json
-import copy
 from zmq.sugar.frame import Message
-import traceback
 
 class Translator():
 
@@ -29,13 +26,12 @@ class Translator():
             "color" : {
                 "currentColor" : None
             },
-            
             "motor" : {
-                "amount": 0,
-                "rotation": 0,
-                "speed": 0,            
-                "unit": 0,
-                "steering": 0
+                "stall":None,
+                "currentPosition":None
+            },
+            "hub" : {
+                "rotation":None,
             }
         }
         self.thread = None
@@ -56,7 +52,7 @@ class Translator():
             while currentVal:
                 # Handle Recieve
                 try:
-                    self.newData = self.socket.recv(copy=True)
+                    self.newData = self.socket.recv()
 
                     # Handle Send
                     if self.sendMessage == True:

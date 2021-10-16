@@ -4,14 +4,15 @@ class Motor:
 
     def __init__(self,id):
         self.id = id
-        self.speed = 0
+        self.speed = None
         self.rotation = 0.0
-        self.stopAction = "coast"
+        self.stopAction = "brake"
         self.unit = "rotations"
-        self.currentMessageDict = {}
-        self.translator = Translator.getInstance()
         self.default_speed = None
         self.position = (0,0)
+        self.stallDetect = False
+        self.currentMessageDict = {}
+        self.translator = Translator.getInstance()
 
     def __set_rotations(self,rotation,unit):
         if self.rotation != rotation:
@@ -21,7 +22,7 @@ class Motor:
             
     def __set_speed(self,newSpeed):
         if isinstance(newSpeed,int):
-            if(-100 <= newSpeed <= 100):
+            if ( newSpeed >= -100 and newSpeed <= 100):
                 if self.speed != newSpeed:
                     self.speed = newSpeed
         else:
@@ -36,8 +37,9 @@ class Motor:
             raise Exception("Type Error, the new unit is not a string")
 
     def set_stop_action(self,stopAction):
-        actions = ["coast", "brake", "hold"]
+        
         if isinstance(stopAction,str):
+                actions = ["coast", "brake", "hold"]
                 if stopAction in actions:
                     if self.stopAction != stopAction:
                         self.stopAction = stopAction
@@ -51,7 +53,7 @@ class Motor:
 
     def set_default_speed(self, newDefSpeed):
         if isinstance(newDefSpeed, int):
-            if(-100 <= newDefSpeed <= 100):
+            if ( newDefSpeed >= -100 and newDefSpeed <= 100):
                 if self.default_speed != newDefSpeed:
                     self.default_speed = newDefSpeed
         else:
@@ -70,13 +72,15 @@ class Motor:
         return self.id
     
     def get_speed(self):
+        if self.speed == None:
+            return self.default_speed
         return self.speed    
 
     def __get_rotation(self):
         return self.rotation
 
     def get_position(self):
-        motorDict = self.translator.getMessage("position")
+        motorDict = self.translator.getMessage("motor")
         currentPos = motorDict["currentPosition"]
 
         if currentPos != self.position:
@@ -97,14 +101,14 @@ class Motor:
         dict = {
             "motorMessage": 
                 {
-                    "id":self.__get_id(),
-                    "amount":amount,
-                    "rotation":self.__get_rotation(),
-                    "speed":self.get_speed(),            
-                    "unit":self.unit,
-                    "steering":steering,
-                    "stall":"true",
-                    "default_speed": self.get_default_speed()
+                    "id": self.__get_id(),
+                    "amount": amount,
+                    "rotation": self.__get_rotation(),
+                    "speed": self.get_speed(),            
+                    "unit": self.unit,
+                    "steering": steering,
+                    "stall": self.stallDetect,
+                    "stopAction": self.stopAction
                 }
         }
         return dict   
@@ -121,7 +125,7 @@ class Motor:
         #runs motor to an absolute position (rotates motor X degrees), degrees 0-359
         #"Shortest path", "Clockwise", "Counterclockwise" are options for direction.
         #NEED DATA FROM UNITY
-        return
+        pass
 
     def run_to_degrees_counted(self,degrees, speed):
         #runs motor until # of degrees counted is equal to degrees parameter
@@ -139,7 +143,7 @@ class Motor:
     def run_for_degrees(degrees, speed):
         #runs motor for a specified # of degrees
         #UNITY DATA 
-        return
+        pass
 
     #runs motor for specified # of rotations
     def run_for_rotations(self, rotations, speed):
@@ -156,38 +160,38 @@ class Motor:
     def run_for_seconds(self, seconds, speed):
         #runs motor for specified # of seconds
         #UNITY DATA
-        return
+        pass
+
+    def __sendMotorMessage(self,speed):
+        self.__set_speed(speed)
+        motorDict = self.__get_messageDict()
+        if  self.__should_send_message(motorDict) == True:
+            self.translator.sendMessageToUnity(motorDict)
 
     #starts the motor
     #SEND START SIGNAL TO UNITY
-    def start(self,speed = None ):
+    def start(self,speed = 75 ):
+        self.__sendMotorMessage(speed)
 
-        self.__set_speed(speed)
-
-        motorDict = self.get_messageDict()
-        if  self.should_send_message(motorDict) == True:
-            self.translator.sendMessageToUnity(motorDict)
     #stops the motor, not very smoothly i think
     #SEND STOP SIGNAL TO UNITY
     def stop(self):
-        if(self.stopAction == "hold"):
-            #holding will acitvely drive motor to whatever the end condition is
-            pass
-        elif(self.stopAction == "break"):
-            self.__set_speed(0)
-        elif(self.stopAction == "coast"):
-           #math to make vehicle coast
-           pass
+        self.__sendMotorMessage(0)
 
     def start_at_power(power):
         #starts at specified power level
         #do we need this?
-        return
+        pass
 
     def was_interrupted():
-        return #BOOL- whether or not motor was interrupted
+        pass #BOOL- whether or not motor was interrupted
 
-    #possible int tracker (0,1,2)
-    #0 - motor stall detection on, 1 - motor stall detection off, 2 - motor is stalled
-    def was_stalled():
-        return #BOOL- whether or not motor was stalled
+    def was_stalled(self):
+        isValid = False
+        if self.stallDetect == True:
+            #Request message
+            motorDict = self.translator.getMessage("motor")
+            if motorDict["stall"] == "True":
+                isValid = True
+        return isValid
+       
