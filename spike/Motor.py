@@ -1,8 +1,9 @@
 from .Translator import Translator
-
+from .PrimeHub import PrimeHub
 class Motor:
 
     def __init__(self,id):
+        self.primeHub = PrimeHub.getInstance()
         self.id = id
         self.speed = None
         self.rotation = 0.0

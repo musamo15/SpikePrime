@@ -1,8 +1,9 @@
 from .Translator import Translator
-
+from .PrimeHub import PrimeHub
 class ColorSensor:
 
     def __init__(self):
+        self.primeHub = PrimeHub.getInstance()
         self.curentColor = None
         self.light1Brightness = 0
         self.light2Brightness = 0
