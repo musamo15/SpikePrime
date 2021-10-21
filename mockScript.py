@@ -2,7 +2,7 @@
 from spike import PrimeHub,Motor,ColorSensor
 hub = PrimeHub()
 
-colorSensor = ColorSensor()
+colorSensor = ColorSensor("A")
 
 lMotor = Motor("A")
 rMotor = Motor("B")

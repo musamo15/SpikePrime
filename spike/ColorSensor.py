@@ -4,7 +4,7 @@ from .PrimeHub import PrimeHub
 class ColorSensor:
 
     validColors = ["black","violet","blue","cyan","green","yellow","red","white","None"]
-    def __init__(self):
+    def __init__(self,id):
         self.primeHub = PrimeHub.getInstance()
         self.curentColor = None
         self.light1Brightness = 0
