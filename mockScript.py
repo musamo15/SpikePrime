@@ -1,8 +1,10 @@
 #!/usr/bin/python3
-from spike import PrimeHub,Motor,ColorSensor
+from spike import PrimeHub,Motor,ColorSensor,DistanceSensor
 hub = PrimeHub()
 
-colorSensor = ColorSensor("A")
+cs = ColorSensor("A")
+ds = DistanceSensor("A")
+
 
 lMotor = Motor("A")
 rMotor = Motor("B")
@@ -10,6 +12,9 @@ lMotor.set_default_speed(111110)
 
 lMotor.start(15)
 rMotor.start(15)
+
+while(True):
+    print(ds.get_distance_cm())
 
 
 

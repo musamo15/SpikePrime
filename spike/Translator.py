@@ -3,6 +3,7 @@ import zmq
 import json
 from zmq.sugar.frame import Message
 
+
 class Translator():
 
     __instance = None
@@ -32,6 +33,9 @@ class Translator():
             },
             "hub" : {
                 "rotation":None,
+            },
+            "distance" : {
+                "value":None
             }
         }
         self.thread = None
@@ -86,9 +90,18 @@ class Translator():
       
            
     def handleDataFromUnity(self,message):
+
         try:
-           dict = eval(message)
-           for key in dict.keys():
-                self.messageDict[key] = dict[key]
+           dict1 = message.decode()
+           dict1 = eval(dict1)
+    
+
+           for i in dict1:
+            for key in i.keys():
+                    
+                    self.messageDict[key] = i[key]
         except Exception:
             print("Exception While Parsing Data")
+
+
+        

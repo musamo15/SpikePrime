@@ -10,7 +10,7 @@ class Motor:
         self.stopAction = "brake"
         self.unit = "rotations"
         self.default_speed = None
-        self.position = (0,0)
+        self.position = (0,0,0)
         self.stallDetect = False
         self.currentMessageDict = {}
         self.translator = Translator.getInstance()

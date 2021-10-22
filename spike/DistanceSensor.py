@@ -6,7 +6,7 @@ class DistanceSensor:
     def __init__(self,id):
         self.id = id
         self.unit = "cm"
-        self.distance = int
+        self.distance = 0.0
         self.brightness1 = 0
         self.brightness2 = 0
         self.brightness3 = 0
@@ -19,7 +19,8 @@ class DistanceSensor:
     #Gets distance from Unity via JSON data
     def __get_distance(self):
         distDict = self.translator.getMessage("distance")
-        messageDist = distDict["distance"]
+        messageDist = distDict["value"]
+        
 
         if self.distance != messageDist:
             self.distance = messageDist
@@ -54,8 +55,8 @@ class DistanceSensor:
 
     #Retrieves measured distance in centimeters
     def get_distance_cm(self, short_range=False):
-        if isinstance(short_range, str):
-            return self.__get_distance
+        if isinstance(short_range, bool):
+            return self.__get_distance()
         else:
             raise Exception("TypeError, short_range is not a string")
 
