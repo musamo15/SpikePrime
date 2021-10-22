@@ -56,7 +56,7 @@ class DistanceSensor:
     #Retrieves measured distance in centimeters
     def get_distance_cm(self, short_range=False):
         if isinstance(short_range, bool):
-            return self.__get_distance()
+            return float(self.__get_distance())
         else:
             raise Exception("TypeError, short_range is not a string")
 

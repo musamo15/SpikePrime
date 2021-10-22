@@ -34,8 +34,17 @@ class ColorSensor:
         pass
 
     def get_reflected_light(self):
-        #get intensity of reflected light as pecentage from 0% - 100%
-        pass
+        if (self.get_color == "white"):
+            return 100
+
+        if (self.get_color == "black"):
+            return 0
+
+        if(self.get_color == None):
+            return 0
+        
+        else:
+            return 50
 
     def get_rgb_intensity(self):
         #get overall color intensity and intensity of r,g,b

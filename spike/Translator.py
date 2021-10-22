@@ -32,7 +32,7 @@ class Translator():
                 "currentPosition":None
             },
             "hub" : {
-                "rotation":None,
+                "rotation":None
             },
             "distance" : {
                 "value":None
