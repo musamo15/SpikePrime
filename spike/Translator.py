@@ -92,16 +92,9 @@ class Translator():
     def handleDataFromUnity(self,message):
 
         try:
-           dict1 = message.decode()
-           dict1 = eval(dict1)
-    
-
-           for i in dict1:
-            for key in i.keys():
-                    
+            dict = eval(message)
+            for i in dict:
+                for key in i.keys():
                     self.messageDict[key] = i[key]
         except Exception:
-            print("Exception While Parsing Data")
-
-
-        
+            print("Exception While Parsing Data")  
