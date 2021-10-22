@@ -5,7 +5,7 @@ class PrimeHub:
     def __init__(self):
         PrimeHub.__instance = self
         print("Created Prime Hub")
-        self.TransLator = Translator.getInstance()
+        self.Translator = Translator.getInstance()
     
     @staticmethod 
     def getInstance():
@@ -13,4 +13,16 @@ class PrimeHub:
       if PrimeHub.__instance == None:
          raise Exception("Theres no hub")
       return PrimeHub.__instance
-    
+
+    class motion_sensor:
+        def __init__(self):
+            self.yaw = 0
+            self.translator = Translator.getInstance()
+
+        def get_yaw_angle(self):
+            yawDict = self.translator.getMessage("hub")
+            messageYaw = yawDict["rotation"]
+
+            if self.yaw != messageYaw:
+                self.yaw = messageYaw
+            return self.yaw
