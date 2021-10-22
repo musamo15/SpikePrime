@@ -15,6 +15,7 @@ rMotor.start(15)
 
 while(True):
     print(ds.get_distance_cm())
+    print(lMotor.get_position())
 
 
 
