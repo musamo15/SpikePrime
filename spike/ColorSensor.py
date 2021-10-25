@@ -1,84 +1,94 @@
+from zmq.sugar.context import T
 from .Translator import Translator
+from .PrimeHub import PrimeHub
 
 class ColorSensor:
 
-    #Color Values: black, violet, blue, cyan, green, yellow, red, white, NONE
-    validColors = ["black","violet","blue","cyan","green","yellow","red","white","None"]
-    def __init__(self):
-        self.curentColor = None
-        self.light1Brightness = 0
-        self.light2Brightness = 0
-        self.light3Brightness = 0
+    def __init__(self,id):
+        self.__primeHub = PrimeHub.getInstance()
+        self.__curentColor = None
+        self.__light1Brightness = 0
+        self.__light2Brightness = 0
+        self.__light3Brightness = 0
 
-        self.translator = Translator.getInstance()
+        self.__translator = Translator.getInstance()
 
+    #Gets current color from Unity via JSON data
     def get_color(self):
-        colorDict = self.translator.getMessage("color")
+        colorDict = self.__translator.getMessage("color")
         messageColor = colorDict["currentColor"]
-        """
-        {
-            {
-                "type" : "color"
-                "currentColor": "value"
-            }
-        }
-        """
-        if self.curentColor != messageColor:
-            self.curentColor = messageColor
-        return self.curentColor
+       
+        if self.__curentColor != messageColor:
+            self.__curentColor = messageColor
+        return self.__curentColor
 
     def get_ambient_light(self):
         #get intensity of ambient light as percentage from 0% (dark) - 100% (bright)
-        return ambientLight
+        pass
 
     def get_reflected_light(self):
-        #get intensity of reflected light as pecentage from 0% - 100%
-        return reflectedLight
+        if (self.get_color == "white"):
+            return 100
+
+        if (self.get_color == "black"):
+            return 0
+
+        if(self.get_color == None):
+            return 0
+        
+        else:
+            return 50
 
     def get_rgb_intensity(self):
         #get overall color intensity and intensity of r,g,b
-        return rgbIntensity
+        pass
 
     def get_red(self):
         #redValue = red int of current color
-        return redValue
+        pass
 
     def get_green(self):
         #greenValue = green int of current color
-        return greenValue
+        pass
 
     def get_blue(self):
         #blueValue = blue int of current color
-        return blueValue
+        pass
 
-    #wait until specified color is detected
+    #Wait until specified color is detected
     def wait_until_color(self, color):
         if isinstance(color, str):
-            if color not in self.validColors: 
-                detected = bool
-                while self.get_color() != color:
-                    detected = False
+            validColors = ["black","violet","blue","cyan","green","yellow","red","white","None"]
+            if color in validColors:
+                currentColor =  self.get_color()
+                while currentColor != color:
+                     currentColor =  self.get_color()
             else:
                 raise Exception("Color entered is not a valid color")
         else:
             raise Exception("TypeError, color entered is not a String or NONE")
-        return detected
-            
+    
+    #Wait for color other than current color
     def wait_for_new_color(self):
         originalColor = self.getColor()
-        newColor = bool
-        while self.getColor() == originalColor:
-            newColor = False
-        return newColor
+        newColor = False
+        currentColor = originalColor
+        while not newColor:
+            currentColor = self.getColor()
+            if currentColor!= originalColor:
+                newColor = True
 
-    #lights up all lights on color sensor at specified brightness
+        return currentColor
+
+    #Lights up all lights on color sensor at specified brightness
     #brightness = 0 for all lights off
-    def light_up_all(self, brightness):
-        self.light_up(brightness,brightness,brightness)
+    def light_up_all(self, brightness=100):
+        self.__light_up(brightness,brightness,brightness)
 
-    #sets brightness of individual lights on the color sensor at specified brightness
-    def light_up(self, light1, light2, light3):
-        self.light1Brightness = light1
-        self.light2Brightness = light2
-        self.light3Brightness = light3
+    #Sets brightness of individual lights on the color sensor at specified brightness
+    def __light_up(self, firstLight, secondLight, thirdLight):
+        self.__light1Brightness = firstLight
+        self.__light2Brightness = secondLight
+        self.__light3Brightness = thirdLight
+        
  
