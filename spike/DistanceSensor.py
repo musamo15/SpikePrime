@@ -4,30 +4,31 @@ from .PrimeHub import PrimeHub
 class DistanceSensor:
 
     def __init__(self,id):
-        self.id = id
-        self.unit = "cm"
-        self.distance = 0.0
-        self.brightness1 = 0
-        self.brightness2 = 0
-        self.brightness3 = 0
-        self.translator = Translator.getInstance()
-        self.primehub = PrimeHub.getInstance()
+        
+        self.__primehub = PrimeHub.getInstance()
+        self.__translator = Translator.getInstance()
+        self.__id = id
+        self.__unit = "cm"
+        self.__distance = 0.0
+        self.__brightness1 = 0
+        self.__brightness2 = 0
+        self.__brightness3 = 0
 
     def __get_id(self):
-        return self.id
+        return self.__id
 
     #Gets distance from Unity via JSON data
     def __get_distance(self):
-        distDict = self.translator.getMessage("distance")
-        messageDist = distDict["value"]
+        distDict = self.__translator.getMessage("distance")
+        messageDict = distDict["value"]
         
 
-        if self.distance != messageDist:
-            self.distance = messageDist
-        return self.distance
+        if self.__distance != messageDict:
+            self.__distance = messageDict
+        return self.__distance
 
     def __get_unit(self):
-        return self.unit
+        return self.__unit
 
     #Lights up all distance sensor lights at one brightness
     def light_up_all(self, brightness=100):
@@ -43,9 +44,9 @@ class DistanceSensor:
         if isinstance(right_top, int):
             if isinstance(left_top, int):
                 if isinstance(right_bottom, int):
-                    self.brightness1 = right_top
-                    self.brightness2 = left_top
-                    self.brightness3 = right_bottom        
+                    self.__brightness1 = right_top
+                    self.__brightness2 = left_top
+                    self.__brightness3 = right_bottom        
                 else:
                     raise Exception("TypeError, right_bottom is not an int")
             else:

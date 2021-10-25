@@ -12,6 +12,7 @@ rMotor = Motor("B")
 
 
 rMotor.start(15)
+print("Hello World")
 lMotor.start(15)
 
     
