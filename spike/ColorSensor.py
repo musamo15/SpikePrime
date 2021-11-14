@@ -1,5 +1,4 @@
-from zmq.sugar.context import T
-from .Translator import Translator
+from .secondTranslator import Translator
 from .PrimeHub import PrimeHub
 
 class ColorSensor:
@@ -15,7 +14,7 @@ class ColorSensor:
 
     #Gets current color from Unity via JSON data
     def get_color(self):
-        colorDict = self.__translator.getMessage("color")
+        colorDict = self.__translator.getMessageFromUnity("color")
         messageColor = colorDict["currentColor"]
        
         if self.__curentColor != messageColor:
