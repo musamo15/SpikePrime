@@ -1,98 +1,154 @@
 import threading
-import zmq
 import json
-from zmq.sugar.frame import Message
-
+import socket
+import os
 
 class Translator():
 
     __instance = None
-
+    __requestResponseServer = None
+    __shutDownServer = None
+    
     def __init__(self):
-        
         if Translator.__instance != None:
             raise Exception("This class is a singleton!")
         else:
-             Translator.__instance = self
-        port = 5556
-        context = zmq.Context()
-        self.__socket = context.socket(zmq.REP)
-        self.__socket.bind("tcp://*:%s" % port)
-        self.__sendMessage = False
-        self.__newMessage = None
-        self.__messageDict = {
-            
-            "color" : {
-                "currentColor" : None
-            },
-            "motor" : {
-                "stall":None,
-                "currentPosition":None
-            },
-            "hub" : {
-                "rotation":None
-            },
-            "distance" : {
-                "value":None
-            }
-        }
-        self.__thread = None
-        self.__newData = None
+            Translator.__instance = self
+        
+        if  Translator.__shutDownServer == None:
+            Translator.__shutDownServer = Translator.__ShutDownServer()
+        
+        if Translator.__requestResponseServer == None:
+            Translator.__requestResponseServer = Translator.__RequestResponseServer()
 
     @staticmethod 
     def getInstance():
       """ Static access method. """
       if Translator.__instance == None:
-         Translator()
+        Translator()
       return Translator.__instance
 
+    def getMessageFromUnity(self,messageDict):
+        sensorMessageDict = self.__requestResponseServer.getMessageFromUnity(messageDict)
+        if sensorMessageDict != None:
+            return sensorMessageDict[messageDict["messageType"]]
+        else:
+            return None
 
-    def run(self):
-        """ Method that runs forever """
-        try:
-            currentVal = True
-            while currentVal:
-                # Handle Recieve
-                try:
-                    self.__newData = self.__socket.recv()
-
-                    # Handle Send
-                    if self.__sendMessage == True:
-                        print("Sending new Data to python")
-                        self.__socket.send_string(json.dumps(self.__newMessage))
-                        self.__sendMessage = False
-                    else:
-                        self.__socket.send_string("Recieved Message")
-                    currentVal = False
-                except Exception:
-                    print("Exception On Message Thread")
-                    self.__socket.close(linger=1000)
-        except Exception:
-            print("Exiting Application")
-            self.__socket.close(linger=1000)
+    def sendMessageToUnity(self,newMessage):
+        self.__requestResponseServer.sendMessageToUnity(newMessage)
     
-    def getMessage(self,type):
-        self.__thread = threading.Thread(target=self.run, args=(),daemon=False)
-        self.__thread.start()                                 
-        self.__thread.join()
-        if self.__newData != None:
-            self.__handleDataFromUnity(self.__newData)
-        return self.__messageDict[type]
+        
+    class __RequestResponseServer():
+        def __init__(self):
+       
+            self.__requestResponsePort = 3000
+        
+            self.__host = '127.0.0.1'
+            self.__newData = None
+            self.__socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM) 
+            self.__socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            notConnected  = True
+       
+            print("Waiting to be connected")
+            while notConnected:
+                try:
+                    self.__socket.connect((self.__host,self.__requestResponsePort))
+                    notConnected = False
+                except:
+                    pass
+            self.__socket.settimeout(20.0)
+            print("Connected to Unity Simulation")
 
-    def sendMessageToUnity(self,dictionary):
-        self.__sendMessage = True
-        self.__newMessage = dictionary
-        self.__thread = threading.Thread(target=self.run, args=(),daemon=False)
-        self.__thread.start()                                 
-        self.__thread.join()
-      
-           
-    def __handleDataFromUnity(self,message):
+        def __requestMessage(self,messageDict):
+            try:
+                self.__socket.sendall(json.dumps(messageDict).encode('utf-8'))
+                self.__newData = self.__socket.recv(1024)
+            except:
+                self.__newData = None
+                print("Unable To Communicate With Unity1")
+                raise SystemExit
+            
+        def __sendMessage(self,newMessage):
+            """
+            "messageType": "[color,motor,ultrasonic,shutdown]",
+                "messageRequestType": "[Request,Send]",
+                "id": ""
+            """
+            try:
+                self.__socket.sendall(json.dumps(newMessage).encode('utf-8'))
+                self.__socket.recv(1024)
+            except:
+                # raise Exception
+                print("Unable To Communicate With Unity2")
+                # self.cleanSocket()
+                raise SystemExit
+            
+        def __handleDataFromUnity(self,message):
+            """
+            One of these 
+            
+             "motor" : {
+                    "stall":None,
+                    "currentPosition":None
+                }
+            "color" : {
+                    "currentColor" : "Blue"
+                },
+            "hub" : {
+                    "rotation":None,
+                    "distance":None
+                 }
+            """
+            try:
+                return eval(message)
+            except Exception:
+                return None
 
-        try:
-            dict = eval(message)
-            for i in dict:
-                for key in i.keys():
-                    self.__messageDict[key] = i[key]
-        except Exception:
-            print("Exception While Parsing Data")  
+        def getMessageFromUnity(self,messageDict):
+            """
+            "messageType": "[color,motor,ultrasonic]",
+            "messageRequestType": "[Request,Send]",
+            "id": ""
+            """
+            self.__requestMessage(messageDict)
+            if self.__newData != None:
+                return self.__handleDataFromUnity(self.__newData)
+            else:
+                return None
+          
+        def sendMessageToUnity(self,newMessage):
+            self.__sendMessage(newMessage)
+
+        def sendShutDownMessage(self):
+            messageDict = {
+                "messageType": "shutdown",
+                "messageRequestType": "Send"
+            }
+            self.__sendMessage(messageDict)
+
+    class __ShutDownServer():
+        def __init__(self):
+            self.__shutdownListenPort = 4444
+            self.__host = '127.0.0.1'
+            self.__thread = threading.Thread(target=self.__listenForShutdown, args=(),daemon=True)
+            self.__thread.start()  
+            
+        def __listenForShutdown(self):
+            print("Shutdown starting: ")
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind((self.__host, self.__shutdownListenPort))
+                s.listen()
+                conn, addr = s.accept()
+                with conn:
+                    print(addr)
+                    conn.recv(1024)
+
+                    print("Recieved Shutdown Request From Unity")
+                    os._exit(1)       
+
+        # def __handleShutdownMessage(self,message):
+        #     if message == "Shutdown":
+        #         print("Recieved Shutdown Request From Unity")
+        #         os._exit(1)                
+        

@@ -1,25 +1,36 @@
-from .secondTranslator import Translator
+from .Translator import Translator
 from .PrimeHub import PrimeHub
 
 class ColorSensor:
 
     def __init__(self,id):
         self.__primeHub = PrimeHub.getInstance()
+        self.id = id
         self.__curentColor = None
         self.__light1Brightness = 0
         self.__light2Brightness = 0
         self.__light3Brightness = 0
-
         self.__translator = Translator.getInstance()
 
     #Gets current color from Unity via JSON data
     def get_color(self):
-        colorDict = self.__translator.getMessageFromUnity("color")
-        messageColor = colorDict["currentColor"]
+        
+        messageDict = {
+            "messageType": "color",
+            "messageRequestType":"Request",
+            "id": self.id
+        }
+        
+        colorDict = self.__translator.getMessageFromUnity(messageDict)
+        if colorDict == None:
+            return None
+        else:
+            messageColor = colorDict["currentColor"]
        
-        if self.__curentColor != messageColor:
-            self.__curentColor = messageColor
-        return self.__curentColor
+            if self.__curentColor != messageColor:
+                self.__curentColor = messageColor
+            return self.__curentColor
+       
 
     def get_ambient_light(self):
         #get intensity of ambient light as percentage from 0% (dark) - 100% (bright)

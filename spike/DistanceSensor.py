@@ -19,13 +19,22 @@ class DistanceSensor:
 
     #Gets distance from Unity via JSON data
     def __get_distance(self):
-        distDict = self.__translator.getMessage("distance")
-        messageDict = distDict["value"]
         
+        messageDict = {
+            "id": self.__id,
+            "messageType": "distanceSensor",
+            "messageRequestType":"Request"
+        }
+        
+        distDict = self.__translator.getMessageFromUnity(messageDict)
+        if distDict == None:
+            return None
+        else:
+            messageDict = distDict["value"]
 
-        if self.__distance != messageDict:
-            self.__distance = messageDict
-        return self.__distance
+            if self.__distance != messageDict:
+                self.__distance = messageDict
+            return self.__distance
 
     def __get_unit(self):
         return self.__unit
