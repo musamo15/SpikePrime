@@ -21,12 +21,19 @@ class MotionSensor():
         self.__translator = Translator.getInstance()
         
     def get_yaw_angle(self):
-        yawDict = self.__translator.getMessage("hub")
-        messageYaw = yawDict["rotation"]
-
-        if self.__yaw != messageYaw:
-            self.__yaw = messageYaw
-        return int(self.__yaw)
+        messageDict = {
+            "messageType": "hub",
+            "messageRequestType":"Request",
+            "component": "yaw"
+        }
+        yawDict = self.__translator.getMessageFromUnity(messageDict)
+        if yawDict == None:
+            return None
+        else:
+            messageYaw = yawDict["rotation"]
+            if self.__yaw != messageYaw:
+                self.__yaw = messageYaw
+            return int(self.__yaw)
 
 class LightMatrix():
     def __init__(self):
@@ -37,12 +44,10 @@ class LightMatrix():
         if text != self.__currentText:
             self.__currentText = text
             # Send message to unity
-            lightMatrixMessageDict = {
-            "lightMatrixMessage": 
-                {
-                    "text": self.__currentText,
-                    "image":self.__currentImage
-                }
+            lightMatrixMessageDict = { 
+                "messageType": "lightMatrix",
+                "text":  self.__currentText,
+                "image": self.__currentImage
             }
             self.__translator.sendMessageToUnity(lightMatrixMessageDict)
     def show_image(self,image,brightness=100):
@@ -50,11 +55,9 @@ class LightMatrix():
             self.__currentImage = image
             # Send message to unity
             lightMatrixMessageDict = {
-            "lightMatrixMessage": 
-                {
-                    "text": self.__currentText,
-                    "image":self.__currentImage
-                }
+                "messageType": "lightMatrix",
+                "text":  self.__currentText,
+                "image": self.__currentImage
             }
             self.__translator.sendMessageToUnity(lightMatrixMessageDict)
     

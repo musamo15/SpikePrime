@@ -84,12 +84,20 @@ class Motor:
 
     #Gets position from Unity via JSON data
     def get_position(self):
-        motorDict = self.__translator.getMessage("motor")
-        currentPos = motorDict["currentPosition"]
-
-        if currentPos != self.__position:
-            self.__position = currentPos
-        return self.__position 
+        messageDict = {
+            "messageType": "motor",
+            "messageRequestType": "Request",
+            "id": self.__get_id(),
+            "component": "position"
+        }
+        motorDict = self.__translator.getMessageFromUnity(messageDict) 
+        if motorDict == None:
+            return None
+        else:
+            currentPos = motorDict["currentPosition"]
+            if currentPos != self.__position:
+                self.__position = currentPos
+            return self.__position 
         
     def get_degrees_counted(self):
         pass
@@ -103,17 +111,16 @@ class Motor:
     #JSON being sent to unity 
     def __get_messageDict(self,amount=0,steering=0):
         dict = {
-            "motorMessage": 
-                {
-                    "id": self.__get_id(),
-                    "amount": amount,
-                    "rotation": self.__get_rotation(),
-                    "speed": self.get_speed(),            
-                    "unit": self.__unit,
-                    "steering": steering,
-                    "stall": self.__stallDetect,
-                    "stopAction": self.__stopAction
-                }
+            "messageType": "motor",
+            "messageRequestType": "Send",
+            "id": self.__get_id(),
+            "amount": amount,
+            "rotation": self.__get_rotation(),
+            "speed": self.get_speed(),            
+            "unit": self.__unit,
+            "steering": steering,
+            "stall": self.__stallDetect,
+            "stopAction": self.__stopAction
         }
         return dict   
 
@@ -187,8 +194,17 @@ class Motor:
     def was_stalled(self):
         isValid = False
         if self.__stallDetect == True:
-            motorDict = self.__translator.getMessage("motor")
-            if motorDict["stall"] == "True":
-                isValid = True
+            messageDict = {
+                "messageType": "motor",
+                "messageRequestType": "Request",
+                "id": self.__get_id(),
+                "component": "stall"
+            }
+            motorDict = self.__translator.getMessageFromUnity(messageDict)
+            if motorDict == None:
+                return None
+            else:
+                if motorDict["stall"] == "True":
+                    isValid = True
         return isValid
        
