@@ -1,54 +1,73 @@
 from .Translator import Translator
 from .PrimeHub import PrimeHub
 
+"""
+    This library represents the color sensor of the spike prime library
+"""
 class ColorSensor:
 
     def __init__(self,id):
-        self.__primeHub = PrimeHub.getInstance()
+        PrimeHub.getInstance()
         self.id = id
         self.__curentColor = None
-        self.__light1Brightness = 0
-        self.__light2Brightness = 0
-        self.__light3Brightness = 0
         self.__translator = Translator.getInstance()
-
-    #Gets current color from Unity via JSON data
+        self.__rgbDict = {
+            "Black":(0,0,0),
+            "White":(255,255,255),
+            "Blue":(0,0,255),
+            "Green":(11,53,11),
+            "Light Blue":(0,191,255),
+            "Light Green": (0,255,0),
+            "Orange":(255,165,0),
+            "Pink":(255,192,203),
+            "Red":(255,0,0),
+            "Violet":(138,43,226),
+            "Yellow":(255,255,0)            
+        }
+    """
+        Retrieves the currrent color detected by the simulation on that respective port
+    """
     def get_color(self):
-        
         messageDict = {
             "messageType": "color",
             "messageRequestType":"Request",
             "id": self.id
         }
-        
         colorDict = self.__translator.getMessageFromUnity(messageDict)
         if colorDict == None:
             return None
         else:
             messageColor = colorDict["currentColor"]
-       
             if self.__curentColor != messageColor:
                 self.__curentColor = messageColor
             return self.__curentColor
-       
 
+    """
+        Returns the reflected light detected by the simulation.
+        Returns 100 if the detected color is white, 0 if its black
+    """
+    def get_reflected_light(self):     
+        return self.__getRGBValue(str(self.get_color()).strip())
+ 
+    def __getRGBValue(self,color):
+        try:
+            rgbValue = self.__rgbDict[color]
+        except KeyError:
+            return 0
+        total = 0
+        for color in rgbValue:
+            total += color
+        value = (total / 3) * (100/255)
+        return int(value)
+        
+        
+    
+    """
+        The following methods are currently not implemented.
     def get_ambient_light(self):
         #get intensity of ambient light as percentage from 0% (dark) - 100% (bright)
         pass
-
-    def get_reflected_light(self):
-        if (self.get_color == "white"):
-            return 100
-
-        if (self.get_color == "black"):
-            return 0
-
-        if(self.get_color == None):
-            return 0
         
-        else:
-            return 50
-
     def get_rgb_intensity(self):
         #get overall color intensity and intensity of r,g,b
         pass
@@ -99,6 +118,7 @@ class ColorSensor:
     def __light_up(self, firstLight, secondLight, thirdLight):
         self.__light1Brightness = firstLight
         self.__light2Brightness = secondLight
-        self.__light3Brightness = thirdLight
-        
+        self.__light3Brightness = thirdLightcd 
+    """
+    
  
