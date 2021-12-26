@@ -1,11 +1,13 @@
 from .Translator import Translator
 from .PrimeHub import PrimeHub
 
+"""
+    This library represents the distance sensor of the spike prime library
+"""
 class DistanceSensor:
 
     def __init__(self,id):
-        
-        self.__primehub = PrimeHub.getInstance()
+        PrimeHub.getInstance()
         self.__translator = Translator.getInstance()
         self.__id = id
         self.__unit = "cm"
