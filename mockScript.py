@@ -1,23 +1,10 @@
 #!/usr/bin/python3
+
 from spike import PrimeHub,Motor,ColorSensor,DistanceSensor
 
 hub = PrimeHub()
 
-cs = ColorSensor("A")
+colorC = ColorSensor("C")
 
 
-
-lMotor = Motor("A")
-rMotor = Motor("B")
-
-
-rMotor.start(15)
-print("Hello World")
-lMotor.start(15)
-
-    
-
-
-
-
-
+hub.light_matrix.show_image("Heart")
